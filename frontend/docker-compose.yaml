@@ -1,0 +1,49 @@
+# ─── docker-compose.yml ───────────────────────────────────────────────────────
+# Two profiles:
+#   dev:  `docker compose --profile dev up`
+#         Vite HMR dev server, source bind-mounted from host
+#
+#   prod: `docker compose --profile prod up`
+#         Built static files served by nginx
+#
+# The backend (Express + socket.io) is a separate service you will add later.
+# Both profiles expect the backend on BACKEND_URL (default: http://backend:3000).
+
+services:
+
+  # ── Dev ─────────────────────────────────────────────────────────────────
+  frontend-dev:
+    profiles: [dev]
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      # Bind-mount source for instant HMR — node_modules stays inside container
+      - .:/app
+      - /app/node_modules
+    environment:
+      - VITE_BACKEND_URL=${BACKEND_URL:-}   # empty → Vite proxy handles it
+    networks:
+      - p2p-net
+    restart: unless-stopped
+
+  # ── Prod ────────────────────────────────────────────────────────────────
+  frontend-prod:
+    profiles: [prod]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # In prod the browser connects directly to backend — bake URL in
+        VITE_BACKEND_URL: ${BACKEND_URL:-http://backend:5000}
+    ports:
+      - "80:80"
+    networks:
+      - p2p-net
+    restart: unless-stopped
+
+networks:
+  p2p-net:
+    driver: bridge

@@ -1,16 +1,24 @@
-
-# Ignore node modules
-node_modules/
-
-# Ignore log files
+# Logs
+logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# Ignore environment variables
-.env
+node_modules
+dist
+dist-ssr
+*.local
 
-# Ignore macOS system files
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
 .DS_Store
-
-# Ignore IDE settings
-.vscode/
-.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
